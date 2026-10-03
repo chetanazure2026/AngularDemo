@@ -1,0 +1,48 @@
+<app-page-header [title]="isEdit() ? 'Edit task' : 'New task'">
+  <a class="btn btn--ghost" [routerLink]="isEdit() ? ['/tasks', id()] : ['/tasks']">Cancel</a>
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-indicator />
+} @else {
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label class="field">
+      <span class="field__label">Title <span class="required">*</span></span>
+      <input type="text" formControlName="title" maxlength="200" [attr.aria-invalid]="fieldErrors('title').length > 0" />
+      @for (msg of fieldErrors('title'); track msg) { <span class="field__error">{{ msg }}</span> }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Description</span>
+      <textarea formControlName="description" rows="4" maxlength="2000"></textarea>
+      @for (msg of fieldErrors('description'); track msg) { <span class="field__error">{{ msg }}</span> }
+    </label>
+
+    <div class="row">
+      <label class="field">
+        <span class="field__label">Priority</span>
+        <select formControlName="priority">
+          @for (p of priorities; track p) { <option [value]="p">{{ p }}</option> }
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="field__label">Due date</span>
+        <input type="date" formControlName="dueDate" />
+        @for (msg of fieldErrors('dueDate'); track msg) { <span class="field__error">{{ msg }}</span> }
+      </label>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Assigned to (Entra object id)</span>
+      <input type="text" formControlName="assignedTo" placeholder="00000000-0000-0000-0000-000000000000" />
+      @for (msg of fieldErrors('assignedTo'); track msg) { <span class="field__error">{{ msg }}</span> }
+    </label>
+
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create task' }}
+      </button>
+    </div>
+  </form>
+}

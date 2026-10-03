@@ -1,0 +1,23 @@
+<header class="topbar">
+  <a class="brand" routerLink="/">Task Management</a>
+
+  <nav class="nav" aria-label="Main">
+    <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+    <a routerLink="/profile" routerLinkActive="active">Profile</a>
+  </nav>
+
+  <div class="user">
+    @if (auth.isAuthenticated()) {
+      <span class="user__name" [title]="auth.userName() ?? ''">{{ auth.displayName() }}</span>
+      <button type="button" class="btn btn--small" (click)="signOut()">Sign out</button>
+    } @else {
+      <button type="button" class="btn btn--small btn--primary" (click)="signIn()">Sign in</button>
+    }
+  </div>
+</header>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<app-notifications />

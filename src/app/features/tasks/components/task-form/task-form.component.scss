@@ -1,0 +1,45 @@
+.form {
+  max-width: 40rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: .75rem;
+  background: var(--color-surface);
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+
+  &__label {
+    font-weight: 600;
+    font-size: .875rem;
+  }
+
+  &__error {
+    color: var(--color-danger);
+    font-size: .8125rem;
+  }
+}
+
+.required {
+  color: var(--color-danger);
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}

@@ -1,0 +1,46 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem;
+}
+
+h2 {
+  margin: 0 0 .5rem;
+  font-size: 1rem;
+}
+
+h2 + dl,
+h2 + .transitions,
+h2 + p {
+  margin-bottom: 1rem;
+}
+
+.description {
+  white-space: pre-wrap;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .375rem 1rem;
+  margin: 0;
+}
+
+dt {
+  color: var(--color-muted);
+}
+
+dd {
+  margin: 0;
+}
+
+.transitions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.who {
+  font-weight: 600;
+  cursor: help; // hover shows the user's object id
+}

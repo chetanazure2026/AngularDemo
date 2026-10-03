@@ -1,0 +1,55 @@
+@if (loading()) {
+  <app-loading-indicator />
+} @else {
+@if (task(); as t) {
+  <app-page-header [title]="t.title">
+    <a class="btn btn--ghost" routerLink="/tasks">Back</a>
+    <a class="btn" [routerLink]="['/tasks', t.id, 'edit']">Edit</a>
+    @if (canDelete()) {
+      <button type="button" class="btn btn--danger" (click)="deleteTask()">Delete</button>
+    }
+  </app-page-header>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Details</h2>
+      <p class="description">{{ t.description || 'No description.' }}</p>
+      <dl>
+        <dt>Status</dt><dd><span class="badge status--{{ t.status }}">{{ t.status | enumLabel }}</span></dd>
+        <dt>Priority</dt><dd><span class="badge priority--{{ t.priority }}">{{ t.priority }}</span></dd>
+        <dt>Due date</dt><dd>{{ t.dueDate ?? '—' }}</dd>
+        <dt>Assigned to</dt><dd><code>{{ t.assignedTo ?? '—' }}</code></dd>
+      </dl>
+    </section>
+
+    <section class="card">
+      <h2>Change status</h2>
+      @if (nextStatuses().length) {
+        <div class="transitions">
+          @for (s of nextStatuses(); track s) {
+            <button type="button" class="btn" (click)="changeStatus(s)">→ {{ s | enumLabel }}</button>
+          }
+        </div>
+      } @else {
+        <p class="muted">No further transitions from {{ t.status | enumLabel }}.</p>
+      }
+
+      <h2>Audit</h2>
+      <dl>
+        <dt>Created</dt>
+        <dd>
+          {{ t.createdAt | date: 'medium' }} by
+          <span class="who" [title]="t.createdBy">{{ t.createdByName ?? t.createdBy }}</span>
+        </dd>
+        <dt>Updated</dt>
+        <dd>
+          @if (t.updatedAt) {
+            {{ t.updatedAt | date: 'medium' }} by
+            <span class="who" [title]="t.updatedBy ?? ''">{{ t.updatedByName ?? t.updatedBy }}</span>
+          } @else { — }
+        </dd>
+      </dl>
+    </section>
+  </div>
+}
+}

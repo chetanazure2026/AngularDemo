@@ -1,0 +1,102 @@
+<app-page-header title="Tasks" subtitle="Track work items, their priority and due dates.">
+  <a class="btn btn--primary" routerLink="new">+ New task</a>
+</app-page-header>
+
+<form class="filters" (ngSubmit)="applyFilters()">
+  <input
+    type="search"
+    name="search"
+    placeholder="Search title or description…"
+    [(ngModel)]="searchText"
+    aria-label="Search" />
+
+  <select name="status" [(ngModel)]="status" aria-label="Status">
+    <option value="">All statuses</option>
+    @for (s of statuses; track s) {
+      <option [value]="s">{{ s | enumLabel }}</option>
+    }
+  </select>
+
+  <select name="priority" [(ngModel)]="priority" aria-label="Priority">
+    <option value="">All priorities</option>
+    @for (p of priorities; track p) {
+      <option [value]="p">{{ p }}</option>
+    }
+  </select>
+
+  <button type="submit" class="btn">Apply</button>
+  <button type="button" class="btn btn--ghost" (click)="resetFilters()">Reset</button>
+</form>
+
+@if (loading() && !result()) {
+  <app-loading-indicator />
+} @else {
+@if (result(); as page) {
+  @if (page.data.length === 0) {
+    <div class="empty">
+      <p>No tasks match the current filters.</p>
+      <a class="btn btn--primary" routerLink="new">Create your first task</a>
+    </div>
+  } @else {
+    <table class="table" [class.table--busy]="loading()">
+      <thead>
+        <tr>
+          <th><button type="button" class="sort" (click)="sortBy('title')">Title {{ sortIndicator('title') }}</button></th>
+          <th><button type="button" class="sort" (click)="sortBy('status')">Status {{ sortIndicator('status') }}</button></th>
+          <th><button type="button" class="sort" (click)="sortBy('priority')">Priority {{ sortIndicator('priority') }}</button></th>
+          <th><button type="button" class="sort" (click)="sortBy('dueDate')">Due {{ sortIndicator('dueDate') }}</button></th>
+          <th><button type="button" class="sort" (click)="sortBy('createdAt')">Created {{ sortIndicator('createdAt') }}</button></th>
+          <th>Created by</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (task of page.data; track task.id) {
+          <tr>
+            <td><a [routerLink]="[task.id]">{{ task.title }}</a></td>
+            <td>
+              <select
+                class="status status--{{ task.status }}"
+                [value]="task.status"
+                (change)="changeStatus(task, $any($event.target).value)"
+                aria-label="Change status">
+                <option [value]="task.status">{{ task.status | enumLabel }}</option>
+                @for (next of transitions[task.status]; track next) {
+                  <option [value]="next">{{ next | enumLabel }}</option>
+                }
+              </select>
+            </td>
+            <td><span class="badge priority--{{ task.priority }}">{{ task.priority }}</span></td>
+            <td>{{ task.dueDate ?? '—' }}</td>
+            <td>{{ task.createdAt | date: 'yyyy-MM-dd' }}</td>
+            <td [title]="task.createdBy">{{ task.createdByName ?? '—' }}</td>
+            <td class="actions">
+              <a class="btn btn--small" [routerLink]="[task.id]">View</a>
+              <a class="btn btn--small" [routerLink]="[task.id, 'edit']">Edit</a>
+              @if (canDelete()) {
+                <button type="button" class="btn btn--small btn--danger" (click)="deleteTask(task)">Delete</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <footer class="pager">
+      <span class="muted">{{ page.totalRecords }} task(s) · page {{ page.pageNumber }} of {{ pageCount() }}</span>
+      <div class="pager__controls">
+        <label>
+          Rows
+          <select [value]="page.pageSize" (change)="changePageSize($any($event.target).value)">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </label>
+        <button type="button" class="btn btn--small" [disabled]="page.pageNumber <= 1" (click)="goToPage(page.pageNumber - 1)">Previous</button>
+        <button type="button" class="btn btn--small" [disabled]="page.pageNumber >= pageCount()" (click)="goToPage(page.pageNumber + 1)">Next</button>
+      </div>
+    </footer>
+  }
+}
+}

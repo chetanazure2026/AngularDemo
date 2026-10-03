@@ -1,0 +1,7 @@
+# pnpm settings for this single-package project.
+# Native build scripts pnpm is allowed to run (same as `pnpm approve-builds`); everything else stays blocked.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
