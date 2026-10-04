@@ -1,7 +1,7 @@
 name: angular test app
  
 env:
-  BUILD_PATH: wepapitest-client
+  BUILD_PATH: '.'
   
 on:
   push:
@@ -29,12 +29,12 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '16.x'
+        node-version: '22.x'
  
     - name: Install dependencies
       run: |
         npm install --legacy-peer-deps
-        npm run build-prod
+        npm run build -- --configuration production
       working-directory: ${{ env.BUILD_PATH }}   
  
     - name: Login to Azure
@@ -48,4 +48,4 @@ jobs:
       uses: azure/webapps-deploy@v3.0.0
       with:
         app-name: ${{ secrets.AZURE_PROD_WEBAPP_FRONT_NAME }}
-        package: ${{ env.BUILD_PATH }}/dist/angular-skeleton
+        package: ${{ env.BUILD_PATH }}/dist/webapitest-client/browser
