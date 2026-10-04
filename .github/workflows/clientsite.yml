@@ -1,7 +1,7 @@
-name: Deploy Deskless front portal to Azure app service
+name: angular test app
  
 env:
-  BUILD_PATH: clientsite
+  BUILD_PATH: wepapitest-client
   
 on:
   push:
