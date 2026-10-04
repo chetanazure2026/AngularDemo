@@ -1,0 +1,116 @@
+name: Deploy Deskless front portal to Azure app service
+ 
+env:
+  BUILD_PATH: clientsite
+  
+on:
+  push:
+    branches:
+      - develop
+      - uat
+      - main
+  workflow_dispatch: 
+
+permissions:
+  actions: read
+  checks: read
+  contents: read
+  pull-requests: read
+  id-token: write
+
+jobs:
+  dev:   
+    runs-on: amer-npr-new
+    if: ((github.ref == 'refs/heads/develop') && github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) 
+    environment: DEV      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16.x'
+ 
+    - name: Install dependencies
+      run: |
+        npm install --legacy-peer-deps
+        npm run build-dev
+      working-directory: ${{ env.BUILD_PATH }}   
+ 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZ_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZ_TENANT_ID}}
+        subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}  
+ 
+    - name: Deploy to Azure
+      uses: azure/webapps-deploy@v3.0.0
+      with:
+        app-name: ${{ secrets.AZURE_DEV_WEBAPP_FRONT_NAME }}
+        package: ${{ env.BUILD_PATH }}/dist/angular-skeleton
+
+  uat:   
+    runs-on: amer-npr-new
+    if: ((github.ref == 'refs/heads/uat') && github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed'))
+    environment: UAT
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16.x'
+ 
+    - name: Install dependencies
+      run: |
+        npm install --legacy-peer-deps
+        npm run build-uat
+      working-directory: ${{ env.BUILD_PATH }}   
+ 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZ_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZ_TENANT_ID}}
+        subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}    
+ 
+    - name: Deploy to Azure
+      uses: azure/webapps-deploy@v3.0.0
+      with:
+        app-name: ${{ secrets.AZURE_UAT_WEBAPP_FRONT_NAME }}
+        package: ${{ env.BUILD_PATH }}/dist/angular-skeleton
+
+  prod:   
+    runs-on: amer-prd-new
+    if: ((github.ref == 'refs/heads/main') && github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed'))
+    environment: PROD
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16.x'
+ 
+    - name: Install dependencies
+      run: |
+        npm install --legacy-peer-deps
+        npm run build-prod
+      working-directory: ${{ env.BUILD_PATH }}   
+ 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZ_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZ_TENANT_ID}}
+        subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }} 
+ 
+    - name: Deploy to Azure
+      uses: azure/webapps-deploy@v3.0.0
+      with:
+        app-name: ${{ secrets.AZURE_PROD_WEBAPP_FRONT_NAME }}
+        package: ${{ env.BUILD_PATH }}/dist/angular-skeleton
